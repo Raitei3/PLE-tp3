@@ -21,9 +21,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 public class TP3 {
 
-
-	
-	public enum WCP{
+public enum WCP{
 		nb_cities,
 		nb_pop,
 		total_pop
@@ -32,13 +30,17 @@ public class TP3 {
   public static class TP3Mapper
        extends Mapper<Object, Text, NullWritable, Text>{
 	 
-	public void map(Object key, Text value, Context context
+	  		public void map(Object key, Text value, Context context
 			  ) throws IOException, InterruptedException {
-		if(!value.toString().matches(".*,.*,.*,.*,,.*"))
-			//incrCounter("WCP","nb_pop",1);
-			context.getCounter(WCP.nb_pop).increment(1);
-			context.write(NullWritable.get(), value);
-	  }
+	  			context.getCounter(WCP.nb_cities).increment(1);
+	  			if(!value.toString().matches(".*,.*,.*,.*,,.*")) {
+	  				//String val = value.toString();
+	  				/*Extraire la pop pour incrémenter total_pop */
+	  				context.getCounter(WCP.nb_pop).increment(1);
+	  				context.getCounter(WCP.total_pop).increment(0);
+	  				context.write(NullWritable.get(), value);
+	  			}
+	  		}
   }
   public static class TP3Reducer
        extends Reducer<NullWritable,Text,NullWritable,Text> {
@@ -66,6 +68,8 @@ public class TP3 {
     System.exit(job.waitForCompletion(true) ? 0 : 1);
     Counters count = job.getCounters();
     Counter nb_pop = count.findCounter(WCP.nb_pop);
+    Counter nb_cities = count.findCounter(WCP.nb_cities);
     System.out.println(nb_pop.getDisplayName() + ":" + nb_pop.getValue());
+    System.out.println(nb_cities.getDisplayName() + ":" + nb_cities.getValue());
   }
 }
