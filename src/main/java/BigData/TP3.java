@@ -7,6 +7,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Counter;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -18,12 +20,23 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 // zw,zikamanas village,Zikamanas Village,00,,-18.2166667,27.95
 
 public class TP3 {
+
+
+	
+	public enum WCP{
+		nb_cities,
+		nb_pop,
+		total_pop
+	};
+	
   public static class TP3Mapper
        extends Mapper<Object, Text, NullWritable, Text>{
 	 
 	public void map(Object key, Text value, Context context
 			  ) throws IOException, InterruptedException {
 		if(!value.toString().matches(".*,.*,.*,.*,,.*"))
+			//incrCounter("WCP","nb_pop",1);
+			context.getCounter(WCP.nb_pop).increment(1);
 			context.write(NullWritable.get(), value);
 	  }
   }
@@ -51,5 +64,8 @@ public class TP3 {
     FileInputFormat.addInputPath(job, new Path(args[0]));
     FileOutputFormat.setOutputPath(job, new Path(args[1]));
     System.exit(job.waitForCompletion(true) ? 0 : 1);
+    Counters count = job.getCounters();
+    Counter nb_pop = count.findCounter(WCP.nb_pop);
+    System.out.println(nb_pop.getDisplayName() + ":" + nb_pop.getValue());
   }
 }
