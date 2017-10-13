@@ -35,9 +35,11 @@ public enum WCP{
 	  			context.getCounter(WCP.nb_cities).increment(1);
 	  			if(!value.toString().matches(".*,.*,.*,.*,,.*")) {
 	  				//String val = value.toString();
-	  				/*Extraire la pop pour incrémenter total_pop */
+	  				/*Extraire la pop pour incrémenter total_pop */ 
 	  				context.getCounter(WCP.nb_pop).increment(1);
-	  				context.getCounter(WCP.total_pop).increment(0);
+	  				String[] parts = value.toString().split(",.+,");
+	  				if (parts.length == 6)
+	  					context.getCounter(WCP.total_pop).increment(Integer.parseInt(parts[4]));
 	  				context.write(NullWritable.get(), value);
 	  			}
 	  		}
@@ -52,6 +54,7 @@ public enum WCP{
   }
   public static void main(String[] args) throws Exception {
     Configuration conf = new Configuration();
+    System.out.println("coucou");
     Job job = Job.getInstance(conf, "TP3");
     job.setNumReduceTasks(1);
     job.setJarByClass(TP3.class);
@@ -69,6 +72,8 @@ public enum WCP{
     Counters count = job.getCounters();
     Counter nb_pop = count.findCounter(WCP.nb_pop);
     Counter nb_cities = count.findCounter(WCP.nb_cities);
+    Counter total_pop = count.findCounter(WCP.total_pop);
+    System.out.println(total_pop.getDisplayName() + ":" + total_pop.getValue());
     System.out.println(nb_pop.getDisplayName() + ":" + nb_pop.getValue());
     System.out.println(nb_cities.getDisplayName() + ":" + nb_cities.getValue());
   }
