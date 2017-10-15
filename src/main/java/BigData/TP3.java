@@ -26,22 +26,25 @@ public enum WCP{
 		nb_pop,
 		total_pop
 	};
-	
+
   public static class TP3Mapper
        extends Mapper<Object, Text, NullWritable, Text>{
-	 
+
 	  		public void map(Object key, Text value, Context context
 			  ) throws IOException, InterruptedException {
 	  			context.getCounter(WCP.nb_cities).increment(1);
 	  			if(!value.toString().matches(".*,.*,.*,.*,,.*")) {
 	  				//String val = value.toString();
-	  				/*Extraire la pop pour incrémenter total_pop */ 
+	  				/*Extraire la pop pour incrémenter total_pop */
 	  				context.getCounter(WCP.nb_pop).increment(1);
-	  				String[] parts = value.toString().split(",.+,");
-	  				if (parts.length == 6)
-	  					context.getCounter(WCP.total_pop).increment(Integer.parseInt(parts[4]));
-	  				context.write(NullWritable.get(), value);
-	  			}
+	  				String[] parts = value.toString().split(",");
+	  				if (parts.length == 7){
+							try{
+	  					     context.getCounter(WCP.total_pop).increment(Integer.parseInt(parts[4]));
+	  				       context.write(NullWritable.get(), value);
+					            }catch (NumberFormatException e) {}
+					                 }
+	  			  }
 	  		}
   }
   public static class TP3Reducer
