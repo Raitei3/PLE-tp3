@@ -21,32 +21,32 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 public class TP3 {
 
-public enum WCP{
-		nb_cities,
-		nb_pop,
-		total_pop
-	};
+  public enum WCP{
+  		nb_cities,
+  		nb_pop,
+  		total_pop
+  	};
 
-  public static class TP3Mapper
-       extends Mapper<Object, Text, NullWritable, Text>{
+    public static class TP3Mapper
+         extends Mapper<Object, Text, NullWritable, Text>{
 
-	  		public void map(Object key, Text value, Context context
-			  ) throws IOException, InterruptedException {
-	  			context.getCounter(WCP.nb_cities).increment(1);
-	  			if(!value.toString().matches(".*,.*,.*,.*,,.*")) {
-	  				//String val = value.toString();
-	  				/*Extraire la pop pour incrémenter total_pop */
-	  				context.getCounter(WCP.nb_pop).increment(1);
-	  				String[] parts = value.toString().split(",");
-	  				if (parts.length == 7){
-							try{
-	  					     context.getCounter(WCP.total_pop).increment(Integer.parseInt(parts[4]));
-	  				       context.write(NullWritable.get(), value);
-					            }catch (NumberFormatException e) {}
-					                 }
-	  			  }
-	  		}
-  }
+  	  		public void map(Object key, Text value, Context context
+  			  ) throws IOException, InterruptedException {
+  	  			context.getCounter(WCP.nb_cities).increment(1);
+  	  			if(!value.toString().matches(".*,.*,.*,.*,,.*")) {
+  	  				//String val = value.toString();
+  	  				/*Extraire la pop pour incrémenter total_pop */
+  	  				context.getCounter(WCP.nb_pop).increment(1);
+  	  				String[] parts = value.toString().split(",");
+  	  				if (parts.length == 7){
+  							try{
+  	  					     context.getCounter(WCP.total_pop).increment(Integer.parseInt(parts[4]));
+  	  				       context.write(NullWritable.get(), value);
+  					            }catch (NumberFormatException e) {}
+  					                 }
+  	  			  }
+  	  		}
+    }
   public static class TP3Reducer
        extends Reducer<NullWritable,Text,NullWritable,Text> {
     public void reduce(NullWritable key, Text values,
